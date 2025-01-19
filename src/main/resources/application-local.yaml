@@ -1,0 +1,13 @@
+management:
+  zipkin:
+    tracing:
+      endpoint: http://localhost:9411/api/v2/spans
+rest:
+  ms-auth:
+    scheme: http
+    host: localhost
+    port: 8080
+  ms-client:
+    scheme: http
+    host: localhost
+    port: 8081

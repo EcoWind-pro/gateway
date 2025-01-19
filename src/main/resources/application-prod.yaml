@@ -1,0 +1,13 @@
+rest:
+  ms-auth:
+    scheme: ${MS_AUTH_SCHEME:http}
+    uri: ${MS_AUTH_URI:auth}
+    port: ${MS_AUTH_PORT:8080}
+  ms-client:
+    scheme: ${MS_CLIENT_SCHEME:http}
+    host: ${MS_CLIENT_URI:client}
+    port: ${MS_CLIENT_PORT:8081}
+management:
+  zipkin:
+    tracing:
+      endpoint: http://zipkin:9411/api/v2/spans
