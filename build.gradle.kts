@@ -17,6 +17,7 @@ kotlin.compilerOptions.freeCompilerArgs.addAll("-Xjsr305=strict")
 val coroutinesVersion = "1.9.0"
 val serializationVersion = "1.6.2"
 val authapiVersion = "1.0.0"
+val clientapiVersion = "1.0.0"
 val exceptionshandlerVersion = "1.0.0"
 val utilsVersion = "1.0.0"
 val detektVersion = "1.23.7"
@@ -56,6 +57,7 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-security")
 
     implementation("ecowind.ru:authapi:$authapiVersion")
+    implementation("ecowind.ru:clientapi:$clientapiVersion")
     implementation("ecowind.ru:exceptionhandler:$exceptionshandlerVersion")
     implementation("ecowind.ru:utils:$utilsVersion")
 

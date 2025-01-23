@@ -10,4 +10,4 @@ rest:
 management:
   zipkin:
     tracing:
-      endpoint: http://zipkin:9411/api/v2/spans
+      endpoint: ${ZIPKIN_URL:http://zipkin:9411/api/v2/spans}

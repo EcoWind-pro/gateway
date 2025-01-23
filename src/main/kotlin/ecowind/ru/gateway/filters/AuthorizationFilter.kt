@@ -1,8 +1,8 @@
 package ecowind.ru.gateway.filters
 
+import ecowind.ru.ClientAPI
 import ecowind.ru.authapi.TokenAPI
 import ecowind.ru.exceptionhandler.excepions.ActionException
-import ecowind.ru.gateway.models.GatewayErrorDetails
 import ecowind.ru.gateway.actions.AuthorizationAction
 import ecowind.ru.gateway.configs.properties.RestServiceProps
 import kotlinx.coroutines.runBlocking
@@ -22,16 +22,21 @@ import reactor.core.publisher.Mono
 @Component
 class AuthorizationFilter(
     private val authorizationAction: AuthorizationAction,
-    private val restServiceProps: RestServiceProps
+    restServiceProps: RestServiceProps
 ) : WebFilter {
     private val log: Logger = LoggerFactory.getLogger(this.javaClass.name)
+    private val excludedApis: List<String> = listOf(
+        restServiceProps.msAuth.path.plus(TokenAPI.PREFIX).plus(TokenAPI.CREATE),
+        restServiceProps.msClient.path.plus(ClientAPI.PREFIX).plus(ClientAPI.REGISTER)
+    )
 
     /**
      * Override filter method that wil be executed on every request. In filter requesting to another microservice to validate token of user.
      */
     override fun filter(exchange: ServerWebExchange, chain: WebFilterChain): Mono<Void> = runBlocking {
         val request: ServerHttpRequest = exchange.request
-        if (request.path.value() != restServiceProps.msAuth.path.plus(TokenAPI.PREFIX).plus(TokenAPI.CREATE)) {
+
+        if (request.path.value() !in excludedApis) {
             try {
                 authorizationAction.checkAuthorization(request.headers.getOrEmpty(HttpHeaders.AUTHORIZATION)[0])
             } catch (ex: ActionException) {
@@ -47,21 +52,13 @@ class AuthorizationFilter(
      */
     private fun handleError(exchange: ServerWebExchange, ex: ActionException): Mono<Void> {
         val response = exchange.response
-        val message: String = ex.message
 
         response.statusCode = ex.status
         response.headers.contentType = MediaType.APPLICATION_JSON
 
         return response.writeWith(
             Mono.just(
-                response.bufferFactory().wrap(
-                    Json.encodeToString(
-                        GatewayErrorDetails(
-                            message = message,
-                            shortMessage = message.substringAfter("was not completed: ")
-                        )
-                    ).toByteArray()
-                )
+                response.bufferFactory().wrap(Json.encodeToString(ex.errorDetails).toByteArray())
             )
         )
     }

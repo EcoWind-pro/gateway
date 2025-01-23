@@ -21,10 +21,10 @@ class AuthorizationAction(
      *
      * @param token token that need to be validated
      */
-    suspend fun checkAuthorization(token: String): ClientResponse {
+    suspend fun checkAuthorization(token: String): Any {
         val msAuthData: MsData = restServiceProps.msAuth
         return webClient
-            .get()
+            .post()
             .uri(
                 generateUri(
                     scheme = msAuthData.scheme,
@@ -34,7 +34,7 @@ class AuthorizationAction(
                 )
             )
             .header(HttpHeaders.AUTHORIZATION, token)
-            .exchangeToMono { exchangeCatchingErrors(it) }
+            .exchangeToMono { exchangeCatchingErrors<ClientResponse>(it) }
             .awaitSingle()
     }
 }
